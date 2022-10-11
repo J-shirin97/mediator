@@ -1,0 +1,10 @@
+{
+  "url": [
+    "GET localhost:3000/",
+    "POST localhost:3000/",
+    "PUT localhost:3000/",
+    "DELETE localhost:3000/"
+
+  ]
+}
+
