@@ -16,7 +16,7 @@ public class HttpConnection {
         // creating a request the http url connection
         HttpURLConnection connection = null;
 
-        URL url = new URL("");
+        URL url = new URL("https://localhost:3000/");
         connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod(connection.getRequestMethod());
         /*connection.setRequestMethod("GET");*/
