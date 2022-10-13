@@ -1,38 +1,49 @@
 package ir.smartpath;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class HttpConnection {
-    public static void urlConnection() throws IOException {
-
+    public static void urlConnection(List<String> header, String requestMethod, String url, String body) throws IOException {
         //log in console
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
+        /*logger.info("");*/
+
+        if (Objects.isNull(header) || StringUtils.isBlank(requestMethod) || StringUtils.isBlank(url) || StringUtils.isBlank(body)){
+            throw new NullPointerException("one of them is null");
+        }
+
 
         // creating a request the http url connection
+
         HttpURLConnection connection = null;
 
-        URL url = new URL("https://localhost:3000/");
-        connection = (HttpURLConnection) url.openConnection();
+        URL url1 = new URL(url);
+        connection = (HttpURLConnection) url1.openConnection();
         connection.setRequestMethod(connection.getRequestMethod());
-        /*connection.setRequestMethod("GET");*/
-        connection.setRequestProperty("Content-Type" , "application/json");
+        connection.setRequestProperty("Content-Type", "application/json");
         connection.connect();
 
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine ;
+        String inputLine;
         StringBuilder content = new StringBuilder();
-        while ((inputLine = in.readLine()) != null){
+        while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
         }
         in.close();
-
-
+        System.out.println(content);
 
     }
+
+
+
 }
