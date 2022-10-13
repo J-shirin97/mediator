@@ -10,5 +10,8 @@
         <module name="authorization_mediator" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="authorization_mediator" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
