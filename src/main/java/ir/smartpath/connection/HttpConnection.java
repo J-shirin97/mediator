@@ -1,4 +1,4 @@
-package ir.smartpath;
+package ir.smartpath.connection;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,19 +13,21 @@ import java.util.logging.Logger;
 
 public class HttpConnection {
     public static void urlConnection(List<String> header, String requestMethod, String url, String body) throws IOException {
+
         //log in console
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
         /*logger.info("");*/
 
+        logger.info("checking inputs were null or not ");
         if (Objects.isNull(header) || StringUtils.isBlank(requestMethod) || StringUtils.isBlank(url) || StringUtils.isBlank(body)){
-            throw new NullPointerException("one of them is null");
+            throw new NullPointerException("It is null");
         }
 
 
         // creating a request the http url connection
 
+        logger.info("creating a request the http url connection ");
         HttpURLConnection connection = null;
-
         URL url1 = new URL(url);
         connection = (HttpURLConnection) url1.openConnection();
         connection.setRequestMethod(connection.getRequestMethod());
