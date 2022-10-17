@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 
 
-
 public class Application {
 
     public static void main(String[] args) throws IOException {
@@ -18,6 +17,7 @@ public class Application {
                 new HashMap<>(),
                 "",
                 "http://localhost:3000",
-                "");
+                "",
+                "application/json");
     }
 }
