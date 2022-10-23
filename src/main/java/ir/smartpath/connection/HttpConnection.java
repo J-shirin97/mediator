@@ -1,5 +1,7 @@
 package ir.smartpath.connection;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -36,21 +38,21 @@ public class HttpConnection {
         logger.info("http connection");
         connection = (HttpURLConnection) urll.openConnection();
 
-        logger.info("set content-type");
+        logger.info("content-type : ");
         connection.setRequestProperty("content-type", contentType);
 
 
-        logger.info("set requestMethod");
+        logger.info("requestMethod : ");
         connection.setRequestMethod(requestMethod);
 
 
-        logger.info("set header");
+        logger.info("header : ");
         for (String key : header.keySet()) {
             connection.setRequestProperty(key, header.get(key));
         }
 
 
-        logger.info("set body");
+        logger.info("body : ");
         connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setDoOutput(true);
         OutputStream connectionOutputStream = connection.getOutputStream();
@@ -66,14 +68,39 @@ public class HttpConnection {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder content = new StringBuilder();
+
+
         while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
         }
 
+        //convert string to json
+        String json = content.toString();
+        String path = "headers.content-type";
+        JsonObject convertJson = new Gson().fromJson(json, JsonObject.class);
 
+        //fields of response logging
+        logger.info("headers : " + convertJson.get("headers"));
 
-        /*logger.info("log details :" + content);*/
+        JsonObject jsonContent = (JsonObject) convertJson.get("headers");
+        logger.info("content-type : " + jsonContent.get("content-type"));
 
+        /*JsonObject jsonUserAgent = (JsonObject) jsonContent.get("headers");*/
+        logger.info("user-agent : " + jsonContent.get("user-agent"));
+
+        /*JsonObject jsonHost = (JsonObject) jsonContent.get("headers");*/
+        logger.info("host : " + jsonContent.get("host"));
+
+        /*JsonObject jsonAccept = (JsonObject) jsonContent.get("headers");*/
+        logger.info("accept : " + jsonContent.get("accept"));
+
+        /*JsonObject jsonConnection = (JsonObject) jsonContent.get("headers");*/
+        logger.info("connection : " + jsonContent.get("connection"));
+
+        /*JsonObject jsonContentLenght = (JsonObject) jsonContent.get("headers");*/
+        logger.info("content-length : " + jsonContent.get("content-length"));
+
+        logger.info("body : " + convertJson.get("body"));
 
         in.close();
         System.out.println(content);
