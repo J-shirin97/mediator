@@ -24,6 +24,7 @@ public class Application {
                 "POST",
                 "http://localhost:3000",
                 test,
-                "application/xml");
+                "application/xml",
+                "headers.host");
     }
 }
