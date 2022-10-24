@@ -2,6 +2,7 @@ package ir.smartpath.connection;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -10,13 +11,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 public class HttpConnection {
-    public static void urlConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType) throws IOException {
+    public static void urlConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType, String path) throws IOException {
 
 
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
@@ -74,20 +78,27 @@ public class HttpConnection {
         }
 
         //convert string to json
-        String json = content.toString();
-        String path = "headers.content-type";
 
+        String json = content.toString();
         JsonObject convertJson = new Gson().fromJson(json, JsonObject.class);
 
+        //dynamic log for response
         List<String> splitString = Arrays.asList(path.split("\\."));
-        System.out.println(splitString);
-        if (splitString.size()>1){
-            ListIterator<String> listIterator = splitString.listIterator();
-
-
-
+        if (splitString.size() > 1) {
+            Object object = convertJson;
+            for (String stringObj : splitString) {
+                if (object instanceof JsonObject) {
+                    JsonObject jsonObject = (JsonObject) object;
+                    object = jsonObject.get(stringObj);
+                }
+                if (object instanceof JsonPrimitive) {
+                    JsonPrimitive jsonPrimitive = (JsonPrimitive) object;
+                    System.out.println(jsonPrimitive.getAsString());
+                    logger.info("log : " + jsonPrimitive.getAsString());
+                }
+            }
         }
-
+/*
 
         //fields of response logging
         logger.info("headers : " + convertJson.get("headers"));
@@ -95,27 +106,28 @@ public class HttpConnection {
         JsonObject jsonContent = (JsonObject) convertJson.get("headers");
         logger.info("content-type : " + jsonContent.get("content-type"));
 
-        JsonObject jsonUserAgent = (JsonObject) jsonContent.get("headers");
+        *//*JsonObject jsonUserAgent = (JsonObject) jsonContent.get("headers");*//*
         logger.info("user-agent : " + jsonContent.get("user-agent"));
 
-        JsonObject jsonHost = (JsonObject) jsonContent.get("headers");
+        *//*JsonObject jsonHost = (JsonObject) jsonContent.get("headers");*//*
         logger.info("host : " + jsonContent.get("host"));
 
-        JsonObject jsonAccept = (JsonObject) jsonContent.get("headers");
+        *//*JsonObject jsonAccept = (JsonObject) jsonContent.get("headers");*//*
         logger.info("accept : " + jsonContent.get("accept"));
 
-        JsonObject jsonConnection = (JsonObject) jsonContent.get("headers");
+        *//*JsonObject jsonConnection = (JsonObject) jsonContent.get("headers");*//*
         logger.info("connection : " + jsonContent.get("connection"));
 
-        JsonObject jsonContentLenght = (JsonObject) jsonContent.get("headers");
+        *//*JsonObject jsonContentLenght = (JsonObject) jsonContent.get("headers");*//*
         logger.info("content-length : " + jsonContent.get("content-length"));
 
-        logger.info("body : " + convertJson.get("body"));
+        logger.info("body : " + convertJson.get("body"));*/
 
         in.close();
         System.out.println(content);
 
     }
+ }
 
 
-}
+
