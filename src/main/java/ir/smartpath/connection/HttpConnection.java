@@ -3,6 +3,9 @@ package ir.smartpath.connection;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import ir.smartpath.cache.CacheHandler;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -84,21 +87,7 @@ public class HttpConnection {
         JsonObject convertJson = new Gson().fromJson(json, JsonObject.class);
 
         //dynamic log for response
-        List<String> splitString = Arrays.asList(path.split("\\."));
-        if (splitString.size() > 1) {
-            Object object = convertJson;
-            for (String stringObj : splitString) {
-                if (object instanceof JsonObject) {
-                    JsonObject jsonObject = (JsonObject) object;
-                    object = jsonObject.get(stringObj);
-                }
-                if (object instanceof JsonPrimitive) {
-                    JsonPrimitive jsonPrimitive = (JsonPrimitive) object;
-                    System.out.println(jsonPrimitive.getAsString());
-                    logger.info("log : " + jsonPrimitive.getAsString());
-                }
-            }
-        }
+        convertToObject(path, logger, convertJson);
 /*
 
         //fields of response logging
@@ -128,7 +117,30 @@ public class HttpConnection {
         System.out.println(content);
 
     }
- }
+
+
+    private static void convertToObject(String path, Logger logger, JsonObject convertJson) {
+        List<String> splitString = Arrays.asList(path.split("\\."));
+        if (splitString.size() > 1) {
+
+            Object object = convertJson;
+            for (String stringObj : splitString) {
+                if (object instanceof JsonObject) {
+                    JsonObject jsonObject = (JsonObject) object;
+                    object = jsonObject.get(stringObj);
+                }
+                if (object instanceof JsonPrimitive) {
+                    JsonPrimitive jsonPrimitive = (JsonPrimitive) object;
+                    System.out.println(jsonPrimitive.getAsString());
+                    logger.info("log : " + jsonPrimitive.getAsString());
+
+
+                    CacheHandler.ehcacheManager(stringObj, String.valueOf(jsonPrimitive));
+                }
+            }
+        }
+    }
+}
 
 
 

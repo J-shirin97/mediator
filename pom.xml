@@ -46,6 +46,12 @@
             <version>2.10.9.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>3.9.6</version>
+        </dependency>
+
 
     </dependencies>
 
