@@ -88,30 +88,6 @@ public class HttpConnection {
 
         //dynamic log for response
         convertToObject(path, logger, convertJson);
-/*
-
-        //fields of response logging
-        logger.info("headers : " + convertJson.get("headers"));
-
-        JsonObject jsonContent = (JsonObject) convertJson.get("headers");
-        logger.info("content-type : " + jsonContent.get("content-type"));
-
-        *//*JsonObject jsonUserAgent = (JsonObject) jsonContent.get("headers");*//*
-        logger.info("user-agent : " + jsonContent.get("user-agent"));
-
-        *//*JsonObject jsonHost = (JsonObject) jsonContent.get("headers");*//*
-        logger.info("host : " + jsonContent.get("host"));
-
-        *//*JsonObject jsonAccept = (JsonObject) jsonContent.get("headers");*//*
-        logger.info("accept : " + jsonContent.get("accept"));
-
-        *//*JsonObject jsonConnection = (JsonObject) jsonContent.get("headers");*//*
-        logger.info("connection : " + jsonContent.get("connection"));
-
-        *//*JsonObject jsonContentLenght = (JsonObject) jsonContent.get("headers");*//*
-        logger.info("content-length : " + jsonContent.get("content-length"));
-
-        logger.info("body : " + convertJson.get("body"));*/
 
         in.close();
         System.out.println(content);
@@ -140,6 +116,8 @@ public class HttpConnection {
             }
         }
     }
+
+
 }
 
 
