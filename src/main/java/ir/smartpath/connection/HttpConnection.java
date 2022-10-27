@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import ir.smartpath.cache.CacheHandler;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -23,6 +21,9 @@ import java.util.logging.Logger;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 public class HttpConnection {
+    public HttpConnection() {
+    }
+
     public static void urlConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType, String path) throws IOException {
 
 
@@ -36,40 +37,8 @@ public class HttpConnection {
         }
 
 
-        logger.info("creating a request the http url connection ");
-        HttpURLConnection connection = null;
-
-        logger.info("take a new url from function input");
-        URL urll = new URL(url);
-
-        logger.info("http connection");
-        connection = (HttpURLConnection) urll.openConnection();
-
-        logger.info("content-type : ");
-        connection.setRequestProperty("content-type", contentType);
-
-
-        logger.info("requestMethod : ");
-        connection.setRequestMethod(requestMethod);
-
-
-        logger.info("header : ");
-        for (String key : header.keySet()) {
-            connection.setRequestProperty(key, header.get(key));
-        }
-
-
-        logger.info("body : ");
-        connection.setRequestProperty("User-Agent", USER_AGENT);
-        connection.setDoOutput(true);
-        OutputStream connectionOutputStream = connection.getOutputStream();
-        connectionOutputStream.write(body.getBytes());
-        connectionOutputStream.flush();
-        connectionOutputStream.close();
-
-
-        logger.info("connection is connected");
-        connection.connect();
+        CacheHandler.getElement(path);
+        HttpURLConnection connection = getConnection(header, requestMethod, url, body, contentType, logger);
 
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -94,8 +63,45 @@ public class HttpConnection {
 
     }
 
+    public static HttpURLConnection getConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType, Logger logger) throws IOException {
+        logger.info("creating a request the http url connection ");
+        HttpURLConnection connection = null;
 
-    private static void convertToObject(String path, Logger logger, JsonObject convertJson) {
+        logger.info("take a new url from function input");
+        URL urll = new URL(url);
+
+        logger.info("http connection");
+        connection = (HttpURLConnection) urll.openConnection();
+
+        logger.info("content-type : ");
+        connection.setRequestProperty("content-type", contentType);
+
+
+        logger.info("requestMethod : ");
+        connection.setRequestMethod(requestMethod);
+
+        logger.info("header : ");
+        for (String key : header.keySet()) {
+            connection.setRequestProperty(key, header.get(key));
+        }
+
+
+        logger.info("body : ");
+        connection.setRequestProperty("User-Agent", USER_AGENT);
+        connection.setDoOutput(true);
+        OutputStream connectionOutputStream = connection.getOutputStream();
+        connectionOutputStream.write(body.getBytes());
+        connectionOutputStream.flush();
+        connectionOutputStream.close();
+
+        logger.info("connection is connected");
+        connection.connect();
+
+        return connection;
+    }
+
+
+    public static void convertToObject(String path, Logger logger, JsonObject convertJson) {
         List<String> splitString = Arrays.asList(path.split("\\."));
         if (splitString.size() > 1) {
 
@@ -110,14 +116,12 @@ public class HttpConnection {
                     System.out.println(jsonPrimitive.getAsString());
                     logger.info("log : " + jsonPrimitive.getAsString());
 
-
                     CacheHandler.ehcacheManager(stringObj, String.valueOf(jsonPrimitive));
+
                 }
             }
         }
     }
-
-
 }
 
 
