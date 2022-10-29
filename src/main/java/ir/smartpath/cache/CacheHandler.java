@@ -1,9 +1,9 @@
 package ir.smartpath.cache;
 
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
+import net.sf.ehcache.*;
+import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.config.Configuration;
 
 import java.util.logging.Logger;
 
@@ -44,6 +44,22 @@ public class CacheHandler {
             cache.put(elementPut);
         }
     }
+    public final Ehcache createDefaultCache() throws CacheException {
+        Configuration configuration = new Configuration();
+        CacheConfiguration cacheConfiguration = configuration.getDefaultCacheConfiguration();
+        if (cacheConfiguration == null) {
+            return null;
+        } else {
+            cacheConfiguration.setName(Cache.DEFAULT_CACHE_NAME);
+            return createCache(cacheConfiguration);
+        }
+    }
+
+    private Ehcache createCache(CacheConfiguration cacheConfiguration) {
+
+        return (Ehcache) cacheConfiguration;
+    }
+
 }
 
 
