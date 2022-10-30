@@ -12,31 +12,38 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import static ir.smartpath.cache.CacheHandler.logger;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 public class HttpConnection {
-    public HttpConnection() {
-    }
 
-    public static void urlConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType, String path) throws IOException {
-
-
+    public static void urlConnection(HashMap<String, String> header,
+                                     String requestMethod,
+                                     String url,
+                                     String body,
+                                     String contentType,
+                                     String path,
+                                     String expirePath,
+                                     boolean flag)
+            throws IOException {
 
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
 
-
         logger.info("checking inputs were null or not ");
-        if (Objects.isNull(header) || StringUtils.isBlank(requestMethod) || StringUtils.isBlank(url) || Objects.isNull(body) || Objects.isNull(contentType)) {
+        if (Objects.isNull(header) ||
+                StringUtils.isBlank(requestMethod) ||
+                StringUtils.isBlank(url) ||
+                Objects.isNull(body) ||
+                Objects.isNull(contentType)) {
             throw new NullPointerException("It is null");
         }
-
-
         CacheHandler.getElement(path);
         HttpURLConnection connection = getConnection(header, requestMethod, url, body, contentType, logger);
 
@@ -56,14 +63,34 @@ public class HttpConnection {
         JsonObject convertJson = new Gson().fromJson(json, JsonObject.class);
 
         //dynamic log for response
-        convertToObject(path, logger, convertJson);
+
+        String a =convertToObject(path,convertJson);
 
         in.close();
         System.out.println(content);
 
+        //expire time
+        String time = convertToObject(expirePath, convertJson);
+        long expiresTime = 0;
+        if (flag) {
+             expiresTime = Long.parseLong(time) - Instant.now().toEpochMilli();
+        }else
+        { expiresTime= Long.parseLong(time);}
+
+        CacheHandler.putElement(path ,a,expiresTime);
+
+
     }
 
-    public static HttpURLConnection getConnection(HashMap<String, String> header, String requestMethod, String url, String body, String contentType, Logger logger) throws IOException {
+    public static HttpURLConnection getConnection(HashMap<String, String> header,
+                                                  String requestMethod,
+                                                  String url,
+                                                  String body,
+                                                  String contentType,
+                                                  Logger logger)
+            throws IOException {
+
+
         logger.info("creating a request the http url connection ");
         HttpURLConnection connection = null;
 
@@ -85,7 +112,6 @@ public class HttpConnection {
             connection.setRequestProperty(key, header.get(key));
         }
 
-
         logger.info("body : ");
         connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setDoOutput(true);
@@ -96,14 +122,14 @@ public class HttpConnection {
 
         logger.info("connection is connected");
         connection.connect();
-
         return connection;
+
     }
 
+    public static String convertToObject(String path, JsonObject convertJson) {
 
-    public static void convertToObject(String path, Logger logger, JsonObject convertJson) {
         List<String> splitString = Arrays.asList(path.split("\\."));
-        if (splitString.size() > 1) {
+        if (splitString.size() >= 1) {
 
             Object object = convertJson;
             for (String stringObj : splitString) {
@@ -113,15 +139,18 @@ public class HttpConnection {
                 }
                 if (object instanceof JsonPrimitive) {
                     JsonPrimitive jsonPrimitive = (JsonPrimitive) object;
-                    System.out.println(jsonPrimitive.getAsString());
-                    logger.info("log : " + jsonPrimitive.getAsString());
 
-                    CacheHandler.ehcacheManager(stringObj, String.valueOf(jsonPrimitive));
+                    logger.info("Cache Log : " + jsonPrimitive.getAsString());
+
+                    return jsonPrimitive.getAsString();
 
                 }
             }
         }
+        return StringUtils.EMPTY;
     }
+
+
 }
 
 
