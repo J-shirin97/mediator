@@ -25,6 +25,8 @@ public class Application {
                 "http://localhost:3000",
                 test,
                 "application/xml",
-                "headers.host");
+                "headers.host",
+                "expiresAt",
+                true);
     }
 }
