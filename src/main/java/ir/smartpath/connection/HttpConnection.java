@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import ir.smartpath.cache.CacheHandler;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,13 +18,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Logger;
 
 import static ir.smartpath.cache.CacheHandler.logger;
 import static org.springframework.http.HttpHeaders.USER_AGENT;
 
 public class HttpConnection {
 
+    //http connection config
     public static void urlConnection(HashMap<String, String> header,
                                      String requestMethod,
                                      String url,
@@ -31,11 +32,13 @@ public class HttpConnection {
                                      String contentType,
                                      String path,
                                      String expirePath,
-                                     boolean flag)
+                                     boolean flag,
+                                     String userName)
             throws IOException {
 
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
 
+        //checking inputs
         logger.info("checking inputs were null or not ");
         if (Objects.isNull(header) ||
                 StringUtils.isBlank(requestMethod) ||
@@ -44,88 +47,107 @@ public class HttpConnection {
                 Objects.isNull(contentType)) {
             throw new NullPointerException("It is null");
         }
-        CacheHandler.getElement(path);
-        HttpURLConnection connection = getConnection(header, requestMethod, url, body, contentType, logger);
 
+        //caching response & userName
+        CacheHandler.getElement(path + "//" + userName);
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        HttpURLConnection connection = getConnection(header,
+                requestMethod,
+                url,
+                body,
+                contentType,
+                logger,
+                userName);
+
+        // build stringBuilder for inputs
+        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder content = new StringBuilder();
 
-
-        while ((inputLine = in.readLine()) != null) {
+        while ((inputLine = input.readLine()) != null) {
             content.append(inputLine);
         }
+        input.close();
+
 
         //convert string to json
 
         String json = content.toString();
         JsonObject convertJson = new Gson().fromJson(json, JsonObject.class);
 
-        //dynamic log for response
+        //closing connection
 
-        String a =convertToObject(path,convertJson);
-
-        in.close();
-        System.out.println(content);
-
-        //expire time
+        //expire time and caching
+        String cache = convertToObject(path, convertJson);
         String time = convertToObject(expirePath, convertJson);
+
         long expiresTime = 0;
         if (flag) {
-             expiresTime = Long.parseLong(time) - Instant.now().toEpochMilli();
-        }else
-        { expiresTime= Long.parseLong(time);}
+            expiresTime = Long.parseLong(time) - Instant.now().toEpochMilli();
+        } else {
+            expiresTime = Long.parseLong(time);
+        }
 
-        CacheHandler.putElement(path ,a,expiresTime);
-
+        CacheHandler.putElement(path + "//" + userName, cache, expiresTime);
 
     }
 
+    //http connection handling and log
     public static HttpURLConnection getConnection(HashMap<String, String> header,
                                                   String requestMethod,
                                                   String url,
                                                   String body,
                                                   String contentType,
-                                                  Logger logger)
+                                                  Logger logger, String userName)
             throws IOException {
 
 
-        logger.info("creating a request the http url connection ");
+
+        logger.debug("creating a request the http url connection");
         HttpURLConnection connection = null;
 
-        logger.info("take a new url from function input");
+
+        logger.debug("take a url");
         URL urll = new URL(url);
 
-        logger.info("http connection");
+        logger.debug("http connection");
         connection = (HttpURLConnection) urll.openConnection();
 
-        logger.info("content-type : ");
+        logger.debug("content-type : ");
         connection.setRequestProperty("content-type", contentType);
 
 
-        logger.info("requestMethod : ");
-        connection.setRequestMethod(requestMethod);
+        logger.debug("requestMethod : ");
+        connection.setRequestMethod("requestMethod" + requestMethod);
 
-        logger.info("header : ");
+        logger.debug("header : ");
         for (String key : header.keySet()) {
             connection.setRequestProperty(key, header.get(key));
         }
 
-        logger.info("body : ");
+        logger.debug("body : ");
         connection.setRequestProperty("User-Agent", USER_AGENT);
+
         connection.setDoOutput(true);
+
+        //Returns a String representation of this URL connection.
         OutputStream connectionOutputStream = connection.getOutputStream();
+
         connectionOutputStream.write(body.getBytes());
+
+        //Closes this output stream and releases any system resources
         connectionOutputStream.flush();
+
         connectionOutputStream.close();
 
-        logger.info("connection is connected");
+
+        logger.debug("connection is connected");
         connection.connect();
         return connection;
 
     }
 
+    //create object from inputs string
     public static String convertToObject(String path, JsonObject convertJson) {
 
         List<String> splitString = Arrays.asList(path.split("\\."));
@@ -140,17 +162,14 @@ public class HttpConnection {
                 if (object instanceof JsonPrimitive) {
                     JsonPrimitive jsonPrimitive = (JsonPrimitive) object;
 
-                    logger.info("Cache Log : " + jsonPrimitive.getAsString());
+                    logger.info("split response : " + jsonPrimitive.getAsString());
 
                     return jsonPrimitive.getAsString();
-
                 }
             }
         }
         return StringUtils.EMPTY;
     }
-
-
 }
 
 
