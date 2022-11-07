@@ -16,6 +16,7 @@ public class CacheHandler {
 
     static CacheManager cacheManager = new CacheManager();
 
+    //creating cache handler
     public static Element getElement(String key) {
         Cache cache = cacheManager.getCache(cacheName);
         if (cache == null) {
@@ -25,11 +26,13 @@ public class CacheHandler {
         return cache.get(key);
     }
 
+    //input values for caching
     public static void putElement(String key, String value, long expiresTime) {
         Cache cache = cacheManager.getCache(cacheName);
         Element elementPut = new Element(key, value);
         if (cache != null) {
 
+            //dynamiting ttl
             elementPut.setTimeToLive((int) expiresTime);
             cache.put(elementPut);
         }
