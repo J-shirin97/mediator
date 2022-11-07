@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.wso2.carbon.apimgt:org.wso2.carbon.apimgt.localentry.stub:6.8.25">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/carbon/apimgt/org.wso2.carbon.apimgt.localentry.stub/6.8.25/org.wso2.carbon.apimgt.localentry.stub-6.8.25.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/carbon/apimgt/org.wso2.carbon.apimgt.localentry.stub/6.8.25/org.wso2.carbon.apimgt.localentry.stub-6.8.25-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wso2/carbon/apimgt/org.wso2.carbon.apimgt.localentry.stub/6.8.25/org.wso2.carbon.apimgt.localentry.stub-6.8.25-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
