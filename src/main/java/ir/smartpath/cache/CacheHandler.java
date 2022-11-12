@@ -27,7 +27,7 @@ public class CacheHandler {
     }
 
     //input values for caching
-    public static void putElement(String key, String value, long expiresTime) {
+    public static String putElement(String key, String value, long expiresTime) {
         Cache cache = cacheManager.getCache(cacheName);
         Element elementPut = new Element(key, value);
         if (cache != null) {
@@ -36,6 +36,7 @@ public class CacheHandler {
             elementPut.setTimeToLive((int) expiresTime);
             cache.put(elementPut);
         }
+        return key;
     }
 
 }
