@@ -25,15 +25,15 @@ import static org.springframework.http.HttpHeaders.USER_AGENT;
 public class HttpConnection {
 
     //http connection config
-    public static void urlConnection(HashMap<String, String> header,
-                                     String requestMethod,
-                                     String url,
-                                     String body,
-                                     String contentType,
-                                     String path,
-                                     String expirePath,
-                                     boolean flag,
-                                     String userName)
+    public static String urlConnection(HashMap<String, String> header,
+                                       String requestMethod,
+                                       String url,
+                                       String body,
+                                       String contentType,
+                                       String path,
+                                       String expirePath,
+                                       boolean flag,
+                                       String userName)
             throws IOException {
 
         Logger logger = Logger.getLogger(String.valueOf(HttpConnection.class));
@@ -49,7 +49,7 @@ public class HttpConnection {
         }
 
         //caching response & userName
-        CacheHandler.getElement(path + "//" + userName);
+        String getCache = String.valueOf(CacheHandler.getElement(path + "//" + userName));
 
         HttpURLConnection connection = getConnection(header,
                 requestMethod,
@@ -88,8 +88,15 @@ public class HttpConnection {
             expiresTime = Long.parseLong(time);
         }
 
-        CacheHandler.putElement(path + "//" + userName, cache, expiresTime);
+        String putCache =  CacheHandler.putElement(path + "//" + userName, cache, expiresTime);
 
+        if (getCache != null) {
+            return getCache;
+        } else {
+            HttpConnection.getConnection(header, requestMethod, url, body, contentType, logger, userName);
+
+        }
+        return putCache;
     }
 
     //http connection handling and log
@@ -100,7 +107,6 @@ public class HttpConnection {
                                                   String contentType,
                                                   Logger logger, String userName)
             throws IOException {
-
 
 
         logger.debug("creating a request the http url connection");
