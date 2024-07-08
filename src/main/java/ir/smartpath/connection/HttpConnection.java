@@ -27,7 +27,7 @@ public class HttpConnection {
     //http connection config
     public static String urlConnection(HashMap<String, String> header,
                                        String requestMethod,
-                                       String url,
+                                       String url ,
                                        String body,
                                        String contentType,
                                        String path,
